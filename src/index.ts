@@ -12,6 +12,11 @@
  */
 import { parse } from 'cookie'
 
+interface WorkerEnv extends Env {
+  uid: string
+  secret: string
+}
+
 interface Link {
 	path: string
 	text: string
@@ -28,7 +33,7 @@ export default {
 
 		return key.split('/').length === 1 ? list(env, key) : detail(env, key)
 	}
-} satisfies ExportedHandler<Env>
+} satisfies ExportedHandler<WorkerEnv>
 
 const parts = (key: string) => {
 	const parts = key.split('/')
@@ -116,7 +121,7 @@ const detail = async (env: Env, key: string) => {
 	return new Response(obj.body, {headers})
 }
 
-const checkCookie = (env: Env, headers: Headers) => {
+const checkCookie = (env: WorkerEnv, headers: Headers) => {
 	const cookie = parse(headers.get("Cookie") || "")
 	return cookie._uid === env.uid && cookie._secret === env.secret
 }
